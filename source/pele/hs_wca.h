@@ -10,6 +10,7 @@
 
 using std::exp;
 using std::sqrt;
+using std::pow;
 
 namespace pele {
 
@@ -20,12 +21,12 @@ namespace pele {
  */
 struct HS_WCA_interaction {
     double const _eps, _sca;
-    double const _infty, _prfac;
+    double const _infty, _prfac, _tr;
     Array<double> const _radii;
 
     HS_WCA_interaction(double eps, double sca, Array<double> radii) 
         : _eps(eps), _sca(sca),
-          _infty(pow(10.0,50)), _prfac(sca*sca*sca/sqrt(2)),
+          _infty(pow(10.0,50)), _prfac(sca*sca*sca/sqrt(2)), _tr(2./sqrt(_infty)),
           _radii(radii.copy())
     {}
 
@@ -35,14 +36,16 @@ struct HS_WCA_interaction {
         double E;
         double r = sqrt(r2);
         double r0 = _radii[atomi] + _radii[atomj]; //sum of the hard core radii
-        double dr = r - r0;
-        double ir2 = 1.0/(dr*dr);
-        double ir6 = ir2*ir2*ir2;
-        double ir12 = ir6*ir6;
         double C3 = _prfac*r0*r0*r0;
         double C6 = C3*C3;
         double C12 = C6*C6;
         double coff = r0*(1.0 +_sca); //distance at which the soft cores are at contact
+        double dr = r - r0;
+        double dr2 = dr*dr;
+        double dr6 = dr2*dr2*dr2;
+        double ir6 = 1./(dr6+_tr*C6);
+        double ir12 = 1./(dr6*dr6+_tr*_tr*C12);
+
         if (r <= r0) {
             E = _infty * (2 - r/r0);
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<", less than their hard core separation"<<std::endl;
@@ -60,14 +63,17 @@ struct HS_WCA_interaction {
         double E;
         double r = sqrt(r2);
         double r0 = _radii[atomi] + _radii[atomj]; //sum of the hard core radii
-        double dr = r - r0;
-        double ir2 = 1.0/(dr*dr);
-        double ir6 = ir2*ir2*ir2;
-        double ir12 = ir6*ir6;
         double C3 = _prfac*r0*r0*r0;
         double C6 = C3*C3;
         double C12 = C6*C6;
-        double coff = r0*(1+_sca); //distance at which the soft cores are at contact
+        double coff = r0*(1.0 +_sca); //distance at which the soft cores are at contact
+        double tr = 4*_eps*(C12-C6)/_infty;
+        double dr = r - r0;
+        double dr2 = dr*dr;
+        double dr6 = dr2*dr2*dr2;
+        double dr12 = dr6*dr6;
+        double ir6 = 1./(dr6+_tr*C6);
+        double ir12 = 1./(dr12+_tr*_tr*C12);
 
         if (r <= r0) {
             E = _infty * (2 - r/r0);
@@ -75,7 +81,8 @@ struct HS_WCA_interaction {
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<"less than their hard core separation"<<std::endl;
         } else if (r < coff) {
             E = 4.*_eps*(- C6 * ir6 + C12 * ir12) + _eps;
-            *gij = 4.*_eps*(- 6 * C6 * ir6 + 12 * C12 * ir12) / (dr*r); //1/dr because powers must be 7 and 13, this is -g|gij| (for consistency with the loop in pairwise potential)
+            //*gij = 4.*_eps*(- 6 * C6 * ir6 + 12 * C12 * ir12) / (dr*r); //1/dr because powers must be 7 and 13, this is -g|gij| (for consistency with the loop in pairwise potential)
+            *gij = 4.*_eps*(- 6 * C6 * dr6 * ir6 * ir6 + 12 * C12 * dr12 * ir12 * ir12) / (dr*r);
         } else {
             E = 0.;
             *gij = 0.;
