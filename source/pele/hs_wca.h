@@ -44,7 +44,7 @@ struct HS_WCA_interaction {
         double C12 = C6*C6;
         double coff = r0*(1.0 +_sca); //distance at which the soft cores are at contact
         if (r <= r0) {
-            E = _infty;
+            E = _infty * (2 - r/r0);
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<", less than their hard core separation"<<std::endl;
         } else if (r < coff )
             E = 4.*_eps*(-C6*ir6 + C12*ir12) + _eps;
@@ -70,8 +70,8 @@ struct HS_WCA_interaction {
         double coff = r0*(1+_sca); //distance at which the soft cores are at contact
 
         if (r <= r0) {
-            E = _infty;
-            *gij = _infty;
+            E = _infty * (2 - r/r0);
+            *gij = _infty/r0;
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<"less than their hard core separation"<<std::endl;
         } else if (r < coff) {
             E = 4.*_eps*(- C6 * ir6 + C12 * ir12) + _eps;
