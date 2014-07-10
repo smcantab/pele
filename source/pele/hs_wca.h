@@ -157,7 +157,7 @@ public:
  */
 class HS_WCAPeriodic : public SimplePairwisePotential< HS_WCA_interaction, periodic_distance<3> > {
 public:
-    HS_WCAPeriodic(double eps, double sca, Array<double> radii, double const *boxvec)
+    HS_WCAPeriodic(double eps, double sca, Array<double> radii, Array<double> const boxvec)
         : SimplePairwisePotential< HS_WCA_interaction, periodic_distance<3>> (
                 std::make_shared<HS_WCA_interaction>(eps, sca, radii),
                 std::make_shared<periodic_distance<3>>(boxvec)
@@ -167,7 +167,7 @@ public:
 
 class HS_WCAPeriodic2D : public SimplePairwisePotential< HS_WCA_interaction, periodic_distance<2> > {
 public:
-    HS_WCAPeriodic2D(double eps, double sca, Array<double> radii, double const *boxvec)
+    HS_WCAPeriodic2D(double eps, double sca, Array<double> radii, Array<double> const boxvec)
         : SimplePairwisePotential< HS_WCA_interaction, periodic_distance<2>> (
                 std::make_shared<HS_WCA_interaction>(eps, sca, radii),
                 std::make_shared<periodic_distance<2>>(boxvec)
@@ -200,7 +200,7 @@ public:
 class HS_WCAPeriodicFrozen : public FrozenPotentialWrapper<HS_WCAPeriodic> {
 public:
     HS_WCAPeriodicFrozen(double eps, double sca, Array<double> radii, 
-            double const* boxvec, Array<double>& reference_coords, 
+            Array<double> const boxvec, Array<double>& reference_coords,
             Array<size_t>& frozen_dof)
         : FrozenPotentialWrapper< HS_WCAPeriodic > (
                 std::make_shared<HS_WCAPeriodic>(eps, sca, radii, boxvec),
@@ -210,8 +210,8 @@ public:
 
 class HS_WCAPeriodic2DFrozen : public FrozenPotentialWrapper<HS_WCAPeriodic2D> {
 public:
-    HS_WCAPeriodic2DFrozen(double eps, double sca, Array<double> radii, double
-            const* boxvec, Array<double>& reference_coords, Array<size_t>&
+    HS_WCAPeriodic2DFrozen(double eps, double sca, Array<double> radii,
+            Array<double> const boxvec, Array<double>& reference_coords, Array<size_t>&
             frozen_dof)
         : FrozenPotentialWrapper< HS_WCAPeriodic2D > (
                 std::make_shared<HS_WCAPeriodic2D>(eps, sca, radii, boxvec),
@@ -225,7 +225,8 @@ public:
 class HS_WCANeighborList : public SimplePairwiseNeighborList< HS_WCA_interaction > {
 public:
     HS_WCANeighborList(Array<long int> & ilist, double eps, double sca, Array<double> radii)
-        :  SimplePairwiseNeighborList< HS_WCA_interaction > ( new HS_WCA_interaction(eps, sca, radii), ilist) 
+        :  SimplePairwiseNeighborList< HS_WCA_interaction > (
+                std::make_shared<HS_WCA_interaction>(eps, sca, radii), ilist)
     {}
 };
 }
