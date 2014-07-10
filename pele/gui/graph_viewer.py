@@ -1,14 +1,14 @@
-import networkx as nx
-import numpy as np
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QDialog, QWidget
+from pele.gui.ui.dgraph_dlg import minimum_energy_path, check_thermodynamic_info
+from pele.gui.ui.graph_view_ui import Ui_Form
+from pele.rates import RatesLinalg, compute_committors
+from pele.utils.disconnectivity_graph import database2graph
+from pele.utils.events import Signal
+import networkx as nx
+import numpy as np
 
 #from pele.gui.ui.mplwidget import MPLWidgetWithToolbar
-from pele.gui.ui.graph_view_ui import Ui_Form
-from pele.utils.events import Signal
-from pele.utils.disconnectivity_graph import database2graph
-from pele.gui.ui.dgraph_dlg import minimum_energy_path, check_thermodynamic_info
-from pele.rates import RatesLinalg, compute_committors
 
 
 
@@ -52,7 +52,7 @@ class ColorByCommittorAction(QtGui.QAction):
 
 
 class GraphViewWidget(QWidget):
-    def __init__(self, database=None, parent=None, app=None, minima=None):
+    def __init__(self, database=None, parent=None, app=None, minima=None, minima_color_value=None):
         QWidget.__init__(self, parent=parent)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
@@ -75,7 +75,8 @@ class GraphViewWidget(QWidget):
         self._selected_minimum = None
         self._mpl_cid = None
         
-        self._minima_color_value = None
+        self.minima_color_value = minima_color_value
+        self._minima_color_value = self.minima_color_value
     
     
     def on_btn_show_all_clicked(self, clicked=None):
@@ -86,7 +87,7 @@ class GraphViewWidget(QWidget):
         self.from_minima.clear()
         self.positions.clear()
         self.boundary_nodes.clear()
-        self._minima_color_value = None
+        self._minima_color_value = self.minima_color_value
     
     def show_all(self):
         self.ui.label_status.setText("showing full graph")
@@ -328,11 +329,12 @@ class GraphViewWidget(QWidget):
         
 
 class GraphViewDialog(QtGui.QMainWindow):
-    def __init__(self, database, parent=None, app=None):
+    def __init__(self, database, parent=None, app=None, minima_color_value=None):
         QtGui.QMainWindow.__init__(self, parent=parent)
         self.setWindowTitle("Connectivity graph")
 
-        self.widget = GraphViewWidget(database=database, parent=self, app=app)
+        self.widget = GraphViewWidget(database=database, parent=self, app=app, 
+                                      minima_color_value=minima_color_value)
         self.setCentralWidget(self.widget)
         
         self.app = app

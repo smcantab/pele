@@ -607,6 +607,7 @@ class DisconnectivityGraph(object):
                  subgraph_size=None, order_by_energy=False,
                  order_by_basin_size=True, node_offset=1.,
                  center_gmin=True, include_gmin=True, energy_attribute="energy",
+                 energy_function=None,
                  order_by_value=None):
         self.graph = graph
         self.nlevels = nlevels
@@ -619,6 +620,7 @@ class DisconnectivityGraph(object):
         self.energy_attribute = energy_attribute
         self.node_offset = node_offset
         self.get_value = order_by_value
+        self.get_energy_function = energy_function
         if self.center_gmin:
             include_gmin = True
 
@@ -637,6 +639,8 @@ class DisconnectivityGraph(object):
 
     def _getEnergy(self, node):
         """ get the energy of a node """
+        if self.get_energy_function:
+            return self.get_energy_function(node)
         return getattr(node, self.energy_attribute)
     
     def set_energy_levels(self, elevels):
