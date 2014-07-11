@@ -25,7 +25,6 @@ def generate_cython():
 
 generate_cython()
 
-
 #
 # compile fortran extension modules
 #
