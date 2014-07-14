@@ -54,7 +54,7 @@ struct HS_WCA_interaction {
             double gamma6 = gamma3*gamma3;
             double gamma12 = gamma6*gamma6;
             double m = 4 * _eps * (6*C6/(gamma6*gamma) - 12*C12/(gamma12*gamma));
-            E = m*r;
+            E = m*(r-r0) + _infty;
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<", less than their hard core separation"<<std::endl;
         } else if (r < coff )
             E = 4.*_eps*(-C6*ir6 + C12*ir12) + _eps;
@@ -87,7 +87,7 @@ struct HS_WCA_interaction {
             double gamma6 = gamma3*gamma3;
             double gamma12 = gamma6*gamma6;
             double m = 4 * _eps * (6*C6/(gamma6*gamma) - 12*C12/(gamma12*gamma));
-            E = m*r;
+            E = m*(r-r0) + _infty;
             *gij = -m/r;
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<"less than their hard core separation"<<std::endl;
         }
@@ -125,7 +125,7 @@ struct HS_WCA_interaction {
             double gamma6 = gamma3*gamma3;
             double gamma12 = gamma6*gamma6;
             double m = 4 * _eps * (6*C6/(gamma6*gamma) - 12*C12/(gamma12*gamma));
-            E = m*r;
+            E = m*(r-r0) + _infty;
             *gij = -m/r;
             *hij = 0.0;
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<"less than their hard core separation"<<std::endl;
