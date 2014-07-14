@@ -49,7 +49,12 @@ struct HS_WCA_interaction {
         double ir12 = 1./(dr6*dr6);
 
         if (r <= r0) {
-            E = _infty * (2. - r/r0);
+            double gamma = _gamma*r0;
+            double gamma3 = gamma*gamma*gamma;
+            double gamma6 = gamma3*gamma3;
+            double gamma12 = gamma6*gamma6;
+            double m = 4 * _eps * (6*C6/(gamma6*gamma) - 12*C12/(gamma12*gamma));
+            E = m*r;
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<", less than their hard core separation"<<std::endl;
         } else if (r < coff )
             E = 4.*_eps*(-C6*ir6 + C12*ir12) + _eps;
@@ -77,8 +82,13 @@ struct HS_WCA_interaction {
         double ir12 = 1./(dr6*dr6);
 
         if (r <= r0) {
-            E = _infty * (2. - r/r0);
-            *gij = _infty/r0;
+            double gamma = _gamma*r0;
+            double gamma3 = gamma*gamma*gamma;
+            double gamma6 = gamma3*gamma3;
+            double gamma12 = gamma6*gamma6;
+            double m = 4 * _eps * (6*C6/(gamma6*gamma) - 12*C12/(gamma12*gamma));
+            E = m*r;
+            *gij = -m/r;
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<"less than their hard core separation"<<std::endl;
         }
         else if (r < coff) {
@@ -110,9 +120,14 @@ struct HS_WCA_interaction {
         double coff = r0*(1+_sca); //distance at which the soft cores are at contact
 
         if (r <= r0) {
-            E = _infty;
-            *gij = _infty;
-            *hij = _infty;
+            double gamma = _gamma*r0;
+            double gamma3 = gamma*gamma*gamma;
+            double gamma6 = gamma3*gamma3;
+            double gamma12 = gamma6*gamma6;
+            double m = 4 * _eps * (6*C6/(gamma6*gamma) - 12*C12/(gamma12*gamma));
+            E = m*r;
+            *gij = -m/r;
+            *hij = 0.0;
             //std::cout<<"WARNING: distance between atoms "<<atomi<<" and "<<atomj<<" is "<<r0-r<<"less than their hard core separation"<<std::endl;
         } else if (r < coff) {
             E = 4.*_eps*(- C6 * ir6 + C12 * ir12) + _eps;
